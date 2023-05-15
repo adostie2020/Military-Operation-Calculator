@@ -1,11 +1,20 @@
-import json
-import requests
-from flask import Flask, render_template, request
+from flask import Flask
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="fe/fe/build", static_url_path="")
 
-@app.route('/')
+@app.route("/api/route1")
 def main():
-  return 'Hello, World!'
+    # API code here
+    return "Hello, World! This is a test"
 
-app.run(host='0.0.0.0', port=8080)
+
+
+
+
+
+# serve the react routes
+@app.route("/", defaults={"path": ""})
+def react(path):
+    return app.send_static_file("index.html")
+
+app.run(host="0.0.0.0", port=8000)
