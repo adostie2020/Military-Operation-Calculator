@@ -74,7 +74,6 @@ const Main = () => {
 
 
         <br />
-        {/* Add more input fields as needed */}
         <button type="calculate">Calculate</button>
       </form>
     </div>
