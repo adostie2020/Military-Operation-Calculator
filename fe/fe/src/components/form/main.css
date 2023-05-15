@@ -1,0 +1,49 @@
+.Form {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f2f2f2;
+    border-radius: 8px;
+    margin-top: 10px;
+  }
+  
+
+  .Title {
+    font-size: 24px;
+    margin-top: 0;
+    display: flex;
+    justify-content: center;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+  
+  input[type="text"],
+  input[type="date"],
+  input[type="number"],
+  input[type="checkbox"]
+  select {
+    width: 100%;
+    padding: 8px;
+    font-size: 16px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+  
+  button[type="calculate"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 18px;
+    background-color: #4caf50;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  button[type="calculate"]:hover {
+    background-color: #45a049;
+  }

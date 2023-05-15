@@ -1,9 +1,11 @@
 import React from 'react';
+import './header.css'; // Import the CSS file
+
 
 const Header = () => {
   return (
     <header>
-      <h1>Welcome to My Website</h1>
+      <h1>Welcome</h1>
       <nav>
         <ul>
           <li><a href="/">Home</a></li>
