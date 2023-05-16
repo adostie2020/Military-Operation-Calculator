@@ -17,6 +17,8 @@ class TheAircraftTable extends React.Component {
                 '<input id="input2" class="swal2-input swal2-number-input" type="number" placeholder="Aircraft Amount">' +
                 '<input id="input3" class="swal2-input swal2-number-input" type="number" placeholder="Personnel Number">',
             focusConfirm: false,
+            showCancelButton: true,
+            cancelButtonText: 'Cancel',
             preConfirm: () => {
                 const newName = document.getElementById('input1').value;
                 const newAmount = document.getElementById('input2').value;
@@ -34,13 +36,12 @@ class TheAircraftTable extends React.Component {
                     .then((response) => {
                         // Handle the response
                         console.log('Post request successful:', response.data);
+                        window.location.reload();
                     })
                     .catch((error) => {
                         // Handle the error
                         console.error('Error making post request:', error);
                     });
-
-
             },
             didOpen: () => {
                 const numberInputs = document.querySelectorAll('.swal2-number-input');
