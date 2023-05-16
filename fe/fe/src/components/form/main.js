@@ -3,19 +3,19 @@ import './main.css'; // Import the CSS file
 
 
 const Main = () => {
-  const [inputs, setInputs] = useState({ aircraftType: []});
+  const [inputs, setInputs] = useState({ aircraftType: [] });
   const [missingFields, setMissingFields] = useState(null);
 
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target;
-  
+
     if (type === 'checkbox') {
       if (name === 'aircraftType') {
         setInputs((prevInputs) => {
           const updatedAircraftType = checked
             ? [...prevInputs.aircraftType, value]
             : prevInputs.aircraftType.filter((type) => type !== value);
-  
+
           return {
             ...prevInputs,
             [name]: updatedAircraftType,
@@ -82,28 +82,56 @@ const Main = () => {
           Number of Supporters:<p className='required-star'>*</p>
           <input type="number" name="numOfSupporters" value={inputs.numOfSupporters || ''} onChange={handleChange} />
         </label>
-        <br/>
+        <br />
         <label className='airfare'>
           Airfare Type:<p className='required-star'>*</p>
           <select value={inputs.flyOption} name="flyOption" onChange={handleChange}>
             <option value="">-- Select --</option>
             <option value="militaryAir">Military Air</option>
-            <option value="commercialAir">Commercial Air</option>
+            <option value="militaryAir">Commercial Air</option>
           </select>
         </label>
-        
+
         <label className='aircraftType'>
           Aircraft Type:<p className='required-star'>*</p>
           <div className="dropdown">
             <button className="dropdown-toggle" onClick={toggleDropdown}>Select Aircraft Type</button>
             <div id="dropdown-content" className="dropdown-content">
               <label>
-                <input type="checkbox" value="militaryAir" name="aircraftType" onChange={handleChange} checked={inputs.aircraftType && inputs.aircraftType.includes("militaryAir")} />
+                <input
+                  type="checkbox"
+                  value="militaryAir"
+                  name="aircraftType"
+                  onChange={handleChange}
+                  checked={inputs.aircraftType && inputs.aircraftType.includes("militaryAir")}
+                />
                 Military Air
+                {inputs.aircraftType && inputs.aircraftType.includes("militaryAir") && (
+                  <input
+                    type="number"
+                    name="militaryAirQuantity"
+                    value={inputs.militaryAirQuantity || ''}
+                    onChange={handleChange}
+                  />
+                )}
               </label>
               <label>
-                <input type="checkbox" value="commercialAir" name="aircraftType" onChange={handleChange} checked={inputs.aircraftType && inputs.aircraftType.includes("commercialAir")} />
+                <input
+                  type="checkbox"
+                  value="commercialAir"
+                  name="aircraftType"
+                  onChange={handleChange}
+                  checked={inputs.aircraftType && inputs.aircraftType.includes("commercialAir")}
+                />
                 Commercial Air
+                {inputs.aircraftType && inputs.aircraftType.includes("commercialAir") && (
+                  <input
+                    type="number"
+                    name="commercialAirQuantity"
+                    value={inputs.commercialAirQuantity || ''}
+                    onChange={handleChange}
+                  />
+                )}
               </label>
             </div>
           </div>
