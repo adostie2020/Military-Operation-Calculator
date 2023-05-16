@@ -1,11 +1,12 @@
 import Header from '../header/header'
 import Footer from '../footer/footer'
+import TheAircraftTable from '../aircrafttable/aircrafttable';
 
 function AircraftTable() {
   return (
     <div>
       <Header />
-      a la ves
+      <TheAircraftTable />
       <Footer />
     </div>
   );
