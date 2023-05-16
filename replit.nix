@@ -1,5 +1,6 @@
 { pkgs }: {
   deps = [
+		pkgs.nodePackages.prettier
     pkgs.nodejs-16_x
     pkgs.python310Full
     pkgs.replitPackages.prybar-python310
