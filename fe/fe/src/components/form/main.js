@@ -88,7 +88,7 @@ const Main = () => {
           <select value={inputs.flyOption} name="flyOption" onChange={handleChange}>
             <option value="">-- Select --</option>
             <option value="militaryAir">Military Air</option>
-            <option value="militaryAir">Commercial Air</option>
+            <option value="commercialAir">Commercial Air</option>
           </select>
         </label>
 
