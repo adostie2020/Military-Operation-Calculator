@@ -46,7 +46,8 @@ class TheAircraftTable extends React.Component {
     render() {
         return (
             <div>
-                {this.swalfirestuff(this)}
+                alv james
+                <button onClick={() => this.swalfirestuff()}> wtf</button>
             </div>
         );
     }
