@@ -3,7 +3,7 @@ import React from 'react';
 const Header = () => {
   return (
     <header>
-      <h1>Welcome to My Website</h1>
+      <h1>PACAF</h1>
       <nav>
         <ul>
           <li><a href="/">Home</a></li>
