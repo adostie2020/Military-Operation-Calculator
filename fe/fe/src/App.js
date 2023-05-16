@@ -1,16 +1,19 @@
 import logo from './logo.svg';
 import './App.css';
-import Header from './components/header/header'
-import Main from './components/form/main'
-import Footer from './components/footer/footer'
+import HomePage from './components/home/HomePage';
+import AircraftTable from './components/home/AircraftTable-Page';
+import ExerciseTable from './components/home/ExerciseTable-page';
+import { BrowserRouter as Router, Route, Link, Routes } from 'react-router-dom';
 
 function App() {
   return (
-    <div>
-      <Header />
-      <Main />
-      <Footer />
-    </div>
+    <Router>
+      <Routes>
+        <Route path='/' element={<HomePage />}></Route>
+        <Route path='/aircraftTable' element={<AircraftTable />}></Route>
+        <Route path='/exerciseTable' element={<ExerciseTable />}></Route>
+      </Routes>
+    </Router>
   );
 }
 
