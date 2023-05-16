@@ -7,6 +7,17 @@ import './aircrafttable.css'
 class TheAircraftTable extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {aircrafts: []};
+    }
+
+    async componentDidMount() {
+        await axios.get('https://hackathon-pacaf--thecosmoking.repl.co/api/get_aircraft')
+          .then(response => {
+            this.setState({aircrafts: response.data.aircrafts});
+          })
+          .catch(error => {
+            console.error(error);
+          });
     }
 
     async swalfirestuff() {
@@ -55,7 +66,27 @@ class TheAircraftTable extends React.Component {
     render() {
         return (
             <div>
-                <button onClick={() => this.swalfirestuff()}>Add New Aircraft</button>
+                <div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Number</th>
+                                <th>Personnel</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {this.state.aircrafts.map((aircraft) => (
+                                <tr key={aircraft.id}>
+                                    <td>{aircraft.type}</td>
+                                    <td>{aircraft.number}</td>
+                                    <td>{aircraft.personnel}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+                <button onClick={() => this.swalfirestuff()}> enter new aircraft</button>
             </div>
         );
     }
