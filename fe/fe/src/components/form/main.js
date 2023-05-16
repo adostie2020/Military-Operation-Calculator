@@ -4,7 +4,7 @@ import './main.css'; // Import the CSS file
 
 const Main = () => {
   const [inputs, setInputs] = useState({ aircraftType: []});
-  const [missingFields, setMissingFields] = useState(true);
+  const [missingFields, setMissingFields] = useState(null);
 
   const handleChange = (event) => {
     const { name, value, type, checked } = event.target;
@@ -40,9 +40,10 @@ const Main = () => {
     const requiredFields = ['departureCity', 'departureDate', 'arrivalCity', 'arrivalDate', 'numOfSupporters', 'flyOption', 'aircraftType', 'lodging'];
     const inputMissingFields = requiredFields.filter(field => !inputs[field]);
     console.log(inputMissingFields);
+    console.log(inputMissingFields.length);
     console.log(inputs.aircraftType);
     setMissingFields(false);
-    if (inputMissingFields.length > 0 && inputs.aircraftType.length === 0) {
+    if (inputMissingFields.length > 0 || inputs.aircraftType.length === 0) {
       setMissingFields(true);
     }
     console.log("Missing fields is " + missingFields);
@@ -60,30 +61,30 @@ const Main = () => {
       <h1 className='Title'>PACAF Calculator</h1>
       <form onSubmit={handleSubmit}>
         <label className='departureCity'>
-          From:
+          From:<p className='required-star'>*</p>
           <input type="text" name="departureCity" value={inputs.departureCity || ''} onChange={handleChange} />
         </label>
         <label className='departureDate'>
-          Select a Date:
+          Select a Date:<p className='required-star'>*</p>
           <input type="date" name="departureDate" value={inputs.departureDate} onChange={handleChange} />
         </label>
         <br />
         <label className='arrivalCity'>
-          To:
+          To:<p className='required-star'>*</p>
           <input type="text" name="arrivalCity" value={inputs.arrivalCity || ''} onChange={handleChange} />
         </label>
         <label className='arrivalDate'>
-          Select a Date:
+          Select a Date:<p className='required-star'>*</p>
           <input type="date" name="arrivalDate" value={inputs.arrivalDate} onChange={handleChange} />
         </label>
         <br />
         <label className='supporters'>
-          Number of Supporters:
+          Number of Supporters:<p className='required-star'>*</p>
           <input type="number" name="numOfSupporters" value={inputs.numOfSupporters || ''} onChange={handleChange} />
         </label>
         <br/>
         <label className='airfare'>
-          Airfare Type:
+          Airfare Type:<p className='required-star'>*</p>
           <select value={inputs.flyOption} name="flyOption" onChange={handleChange}>
             <option value="">-- Select --</option>
             <option value="militaryAir">Military Air</option>
@@ -92,7 +93,7 @@ const Main = () => {
         </label>
         
         <label className='aircraftType'>
-          Aircraft Type:
+          Aircraft Type:<p className='required-star'>*</p>
           <div className="dropdown">
             <button className="dropdown-toggle" onClick={toggleDropdown}>Select Aircraft Type</button>
             <div id="dropdown-content" className="dropdown-content">
@@ -110,7 +111,7 @@ const Main = () => {
 
         <br />
         <label className='lodging'>
-          Lodging:
+          Lodging:<p className='required-star'>*</p>
           <select value={inputs.lodging} name="lodging" onChange={handleChange}>
             <option value="">-- Select --</option>
             <option value="govLodging">Government Lodging</option>

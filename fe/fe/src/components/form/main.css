@@ -102,3 +102,8 @@
   .missingFields{
     color: red;
   }
+
+  .required-star{
+    color:red;
+    display: inline;
+  }
