@@ -1,3 +1,4 @@
+import json
 import pymongo
 import datetime
 from duffel_api import Duffel
@@ -12,13 +13,14 @@ draftscoll = mongoclient["Drafts"]
 historycoll = mongoclient["History"]
 accountscoll = mongoclient["Accounts"]
 
-@app.route("/api/get_drafts") # Will allow the frontend to get an array object with an accounts drafts. In the future, it will authenticate an account based on cookie and will only return drafts for that specific account
+@app.route("/api/get_drafts")
 def drafts():
   account = accountscoll.find_one({"token": request.cookies.get("token")})
   if account != None:
     drafts = [{"error": "none"}]
     for draft in draftscoll.find({}, {"_id": 0}):
-      drafts.append(draft)
+      if draft["owner"] == account["uid"]:
+        drafts.append(draft)
     return jsonify(sorted(drafts, key=lambda e: e["createdAt"], reverse=True))
   else:
     return [{"error": "unauthorized"}]
@@ -26,6 +28,10 @@ def drafts():
 @app.route("/api/get_history")
 def history():
   return "Work in progress"
+
+@app.route("/hashtest")
+def hashtest():
+  return '{"hash": "' + sha256_crypt.encrypt(request.args.get("password")) + '"}'
 
 @app.route("/api/login", methods=["POST"])
 def login():
@@ -35,9 +41,9 @@ def login():
   else:
     account = accountscoll.find_one({"$or": [{"username": request.json.get("username")}, {"email": request.json.get("username")}]}) # Get account with corresponding username or email
     if account != None: # Make sure account was found and isn't None (MongoDB returns None if the query couldn't be found)
-      if account["password"] == request.json.get("password"): # Checks password given with password in database (will add hashing later)
+      if sha256_crypt.verify(request.json.get("password"), json.loads(account["password"])["hash"]): # Checks password given with password in database (will add hashing later)
         response = make_response(jsonify({"error": "none"}))
-        response.set_cookie("token", account["token"])
+        response.set_cookie("token", account["token"], secure=True, httponly=True)
         return response
       else:
         return jsonify({"error": "invalid"})
