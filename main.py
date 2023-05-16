@@ -51,8 +51,8 @@ def login():
       print("Couldnt find account")
       return jsonify({"error": "invalid"})
       
-  encryped_password = '{"hash": "' + sha256_crypt.encrypt(password) + '"}'
-  return "Work in progress"
+  # encryped_password = '{"hash": "' + sha256_crypt.encrypt(password) + '"}'
+
 
 @app.route("/api/archive")
 def archive():
