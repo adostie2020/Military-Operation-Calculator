@@ -69,20 +69,22 @@ class TheAircraftTable extends React.Component {
                 <div>
                     <table>
                         <thead>
-                            <tr>
-                                <th>Type</th>
-                                <th>Number</th>
-                                <th>Personnel</th>
-                            </tr>
+                        <tr>
+                            <th>type</th>
+                            <th>amount</th>
+                            <th>personnel</th>
+                        </tr>
                         </thead>
                         <tbody>
-                            {this.state.aircrafts.map((aircraft) => (
-                                <tr key={aircraft.id}>
-                                    <td>{aircraft.type}</td>
-                                    <td>{aircraft.number}</td>
-                                    <td>{aircraft.personnel}</td>
-                                </tr>
-                            ))}
+                            {this.state.aircrafts.map((perro, i) => {
+                                return perro.personnel.map((personel, j) => {
+                                    return (<tr>
+                                        <td>{j == 0 ? perro.type : ' '}</td>
+                                        <td>{j + 1}</td>
+                                        <td>{personel != 0 ? personel : 'n/a'}</td>
+                                    </tr>);
+                                });
+                            })}
                         </tbody>
                     </table>
                 </div>
