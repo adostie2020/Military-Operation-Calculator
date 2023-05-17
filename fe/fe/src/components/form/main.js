@@ -7,11 +7,13 @@ class Main extends React.Component {
     super(props);
     this.state = {
       aircrafts: [],
-      inputs: { chosenAircrafts: {} },
+      inputs: {},
       missingfields: false,
+      formData: []
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleAmount = this.handleAmount.bind(this);
   }
 
   async componentDidMount() {
@@ -27,7 +29,6 @@ class Main extends React.Component {
       .catch(error => {
         console.error(error);
       });
-    console.log(this.state.inputs);
   }
 
 
@@ -35,11 +36,12 @@ class Main extends React.Component {
 
     const { name, value, type, checked } = event.target;
     if (name === 'aircraftType') {
-      console.log(value);
-      console.log(this.state.inputs[value]);
+      const inputsCopy = JSON.parse(JSON.stringify(this.state.inputs));
+      inputsCopy[value] = checked;
+      this.setState({ inputs: inputsCopy });
+      //this.setState(this.state.inputs[value] = checked)
       this.state.inputs[value] = checked;
-      console.log(this.state.inputs[value]);
-
+      console.log("Checking for " + value + " it is " + this.state.inputs[value]);
     }
     else {
       this.setState((prevState) => ({
@@ -48,9 +50,21 @@ class Main extends React.Component {
           [name]: value,
         },
       }));
-      console.log(name);
     }
   };
+
+  async handleAmount(event) {
+    const { name, value, type, checked } = event.target;
+    await this.setState((prevState) => ({
+      inputs: {
+        ...prevState.inputs,
+        [name]: parseInt(value),
+      },
+    }));
+    console.log(this.state.inputs);
+  }
+
+
 
   handleSubmit(event) {
 
@@ -70,7 +84,6 @@ class Main extends React.Component {
       }
     };
     const inputMissingFields = requiredFields.filter(field => !hasValue(this.state.inputs[field]));
-    console.log(inputMissingFields);
     let noneSelected = true;
     let run = true;
     while (run) {
@@ -104,14 +117,9 @@ class Main extends React.Component {
       }
       run = false;
     }
-
-    console.log("None selected is " + noneSelected);
-
     this.setState({ missingfields: false });
     if (inputMissingFields.length > 0 || noneSelected) {
-      console.log("Hello?");
       this.setState({ missingfields: true }, () => {
-        console.log("Missing fields is " + this.state.missingfields);
       })
     }
   };
@@ -167,7 +175,9 @@ class Main extends React.Component {
                     checked={this.state.inputs.aircraftType && this.state.inputs.aircraftType.includes("F-22")}
                   />
                   F-22
-                  {this.state.inputs.aircraftType && this.state.inputs.aircraftType.includes("F-22")}
+                  {this.state.inputs["F-22"] && <input
+                    type="number" name="F-22Amount" onChange={this.handleAmount} />
+                  }
                 </label>
                 <label>
                   <input
@@ -178,7 +188,9 @@ class Main extends React.Component {
                     checked={this.state.inputs.aircraftType && this.state.inputs.aircraftType.includes("A-10")}
                   />
                   A-10
-                  {this.state.inputs.aircraftType && this.state.inputs.aircraftType.includes("A-10")}
+                  {this.state.inputs["A-10"] && <input
+                    type="number" name="A-10Amount" onChange={this.handleAmount} />
+                  }
                 </label>
                 <label>
                   <input
@@ -189,7 +201,9 @@ class Main extends React.Component {
                     checked={this.state.inputs.aircraftType && this.state.inputs.aircraftType.includes("C-5")}
                   />
                   C-5
-                  {this.state.inputs.aircraftType && this.state.inputs.aircraftType.includes("C-5")}
+                  {this.state.inputs["C-5"] && <input
+                    type="number" name="C-5Amount" onChange={this.handleAmount} />
+                  }
                 </label>
                 <label>
                   <input
@@ -200,7 +214,9 @@ class Main extends React.Component {
                     checked={this.state.inputs.aircraftType && this.state.inputs.aircraftType.includes("C-17")}
                   />
                   C-17
-                  {this.state.inputs.aircraftType && this.state.inputs.aircraftType.includes("C-17")}
+                  {this.state.inputs["C-17"] && <input
+                    type="number" name="C-17Amount" onChange={this.handleAmount} />
+                  }
                 </label>
                 <label>
                   <input
@@ -211,7 +227,9 @@ class Main extends React.Component {
                     checked={this.state.inputs.aircraftType && this.state.inputs.aircraftType.includes("C-130")}
                   />
                   C-130
-                  {this.state.inputs.aircraftType && this.state.inputs.aircraftType.includes("C-130")}
+                  {this.state.inputs["C-130"] && <input
+                    type="number" name="C-130Amount" onChange={this.handleAmount} />
+                  }
                 </label>
                 <label>
                   <input
@@ -222,7 +240,9 @@ class Main extends React.Component {
                     checked={this.state.inputs.aircraftType && this.state.inputs.aircraftType.includes("F-15C")}
                   />
                   F-15C
-                  {this.state.inputs.aircraftType && this.state.inputs.aircraftType.includes("F15-C")}
+                  {this.state.inputs["F-15C"] && <input
+                    type="number" name="F-15CAmount" onChange={this.handleAmount} />
+                  }
                 </label>
                 <label>
                   <input
@@ -233,7 +253,9 @@ class Main extends React.Component {
                     checked={this.state.inputs.aircraftType && this.state.inputs.aircraftType.includes("KC-135")}
                   />
                   KC-135
-                  {this.state.inputs.aircraftType && this.state.inputs.aircraftType.includes("KC-135")}
+                  {this.state.inputs["KC-135"] && <input
+                    type="number" name="KC-135Amount" onChange={this.handleAmount} />
+                  }
                 </label>
               </div>
             </div>
