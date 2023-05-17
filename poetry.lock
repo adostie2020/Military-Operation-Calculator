@@ -196,6 +196,18 @@ async = ["asgiref (>=3.2)"]
 dotenv = ["python-dotenv"]
 
 [[package]]
+name = "flask-cors"
+version = "3.0.10"
+description = "A Flask extension adding a decorator for CORS support"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+Flask = ">=0.9"
+Six = "*"
+
+[[package]]
 name = "frozenlist"
 version = "1.3.3"
 description = "A list-like structure which implements collections.abc.MutableSequence"
@@ -527,6 +539,14 @@ dev = ["pytest (>=7.0.1)", "pytest-timeout (>=2.1.0)", "build (>=0.7.0)", "pre-c
 doc = ["pytoolconfig", "sphinx (>=4.5.0)", "sphinx-autodoc-typehints (>=1.18.1)", "sphinx-rtd-theme (>=1.0.0)"]
 
 [[package]]
+name = "six"
+version = "1.16.0"
+description = "Python 2 and 3 compatibility utilities"
+category = "main"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
+
+[[package]]
 name = "toml"
 version = "0.10.2"
 description = "Python Library for Tom's Obvious, Minimal Language"
@@ -616,7 +636,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.10.0,<3.11"
-content-hash = "681f363e555842c57733d03129afa41dd3d78c4fbb5f729b069c883fcd4115e1"
+content-hash = "e55c2345e9d7f5f5d4846cdb17a11a16570ad32f970d001da86cfa7441c072cc"
 
 [metadata.files]
 aiohttp = []
@@ -634,6 +654,7 @@ cryptography = []
 debugpy = []
 dnspython = []
 flask = []
+flask-cors = []
 frozenlist = []
 idna = []
 iso8601 = []
@@ -660,6 +681,7 @@ replit = []
 replit-python-lsp-server = []
 requests = []
 rope = []
+six = []
 toml = []
 tomli = []
 typing-extensions = []
