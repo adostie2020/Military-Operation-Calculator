@@ -12,6 +12,8 @@ Flask = "^2.2.0"
 urllib3 = "^1.26.12"
 pymongo = "^4.3.3"
 Flask-Cors = "^3.0.10"
+bs4 = "^0.0.1"
+app = "^0.0.1"
 
 [tool.poetry.dev-dependencies]
 debugpy = "^1.6.2"
