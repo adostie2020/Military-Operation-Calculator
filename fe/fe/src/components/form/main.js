@@ -9,7 +9,8 @@ class Main extends React.Component {
       aircrafts: [],
       inputs: {},
       missingfields: false,
-      formData: []
+      formData: [],
+      minAmountSupporters: 0,
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
@@ -31,6 +32,9 @@ class Main extends React.Component {
       });
   }
 
+  onComplete() {
+
+  }
 
   handleChange(event) {
 
@@ -55,13 +59,20 @@ class Main extends React.Component {
 
   async handleAmount(event) {
     const { name, value, type, checked } = event.target;
+
     await this.setState((prevState) => ({
       inputs: {
         ...prevState.inputs,
         [name]: parseInt(value),
       },
     }));
-    console.log(this.state.inputs);
+
+    const aircraftName = name.substring(0, name.length-6);
+    this.state.aircrafts.map((aircraft, i) => {
+      if (aircraft.type === aircraftName){
+        this.setState({minAmountSupporters: this.state.minAmountSupporters + aircraft.personnel[value-1]});
+      }
+    })
   }
 
 
@@ -265,7 +276,7 @@ class Main extends React.Component {
 
           <label className='supporters'>
             Number of Supporters:<p className='required-star'>*</p>
-            <input type="number" name="numOfSupporters" value={this.state.inputs.numOfSupporters || ''} onChange={this.handleChange} />
+            <input type="number" name="numOfSupporters" value={this.state.minAmountSupporters} onChange={this.handleChange} />
           </label>
           <br />
           <label className='airfare'>
