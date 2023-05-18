@@ -23,6 +23,7 @@ class Main extends React.Component {
       missingfields: false,
       minAmountSupporters: 0,
       totalAmountSupports: 0,
+      totalSum: 0,
 
       exerciseName: "",
 
@@ -69,7 +70,7 @@ class Main extends React.Component {
       });
   }
 
-  onComplete(event) {
+  async onComplete(event) {
     event.preventDefault();
     console.log(this.state.inputs);
     console.log(this.state.formData);
@@ -86,7 +87,7 @@ class Main extends React.Component {
     console.log(this.state.peoplePerDiemFood);
 
     //https://hackathon-pacaf--thecosmoking.repl.co/api/flight_details?from=TUCSON&to=LAX&date=2023-05-23&round=True
-    axios.get("https://hackathon-pacaf--thecosmoking.repl.co/api/flight_details", {
+    await axios.get("https://hackathon-pacaf--thecosmoking.repl.co/api/flight_details", {
       params: {
         from: this.state.inputs.departureCity,
         to: this.state.inputs.arrivalCity,
@@ -100,7 +101,7 @@ class Main extends React.Component {
     });
 
     ///api/hotels?code={iata code}
-    axios.get("https://hackathon-pacaf--thecosmoking.repl.co/api/hotels", {
+    await axios.get("https://hackathon-pacaf--thecosmoking.repl.co/api/hotels", {
       params: {
         location: this.state.inputs.arrivalCity
       }
@@ -112,7 +113,7 @@ class Main extends React.Component {
     });
 
     ///api/pdrates?year={YEAR}&month={MONTH IN 01/02/03/04 format}&state={STATE CODE (AZ/CA/FL, etc)}&city={CITY NAME}
-    axios.get("https://hackathon-pacaf--thecosmoking.repl.co/api/pdrates", {
+    await axios.get("https://hackathon-pacaf--thecosmoking.repl.co/api/pdrates", {
       params: {
         year: this.state.inputs.arrivalDate.substring(0, 4),
         month: this.state.inputs.arrivalDate.substring(5, 7),
@@ -127,8 +128,38 @@ class Main extends React.Component {
     });
 
 
-    console.log(this.state);
+    await this.doMath();
+    console.log(this.state.totalSum)
 
+    //["exerciseName", "supporters", "fromLocation", "toLocation", 
+    //"startDate", "endDate", "flightCost", "dataMeals", "dataRate", 
+    //"peopleCommercialAir", "peopleCommercialMilitary", "governmentLodging", 
+    //"commercialLodging", "woodsLodging", "peopleperdiemRate", "peopleperdiemFood", "total"]
+
+    // await axios.post("https://hackathon-pacaf.thecosmoking.repl.co/api/archive_save", {
+    //   body: {
+    //     exerciseName: this.state.inputs.exerciseName,
+    //     supporters: this.state.totalAmountSupports,
+    //     fromLocation: this.state.input.
+    //   }
+    // });
+
+  }
+
+  async doMath(){
+    console.log("people in commercial air: ", this.state.peopleCommercialAir);
+    console.log("flight cost: ", this.state.flightCost);
+    console.log();
+
+    console.log("people in perdiemrate: ", this.state.peoplePerDiemRate);
+    console.log("perdiemrate: ", this.state.dataRate);
+    console.log();
+
+    console.log("people in perdiemfood: ", this.state.peoplePerDiemFood);
+    console.log(this.state.dataMeals);
+    this.state.totalSum = ((this.state.peopleCommercialAir * this.state.flightCost) + 
+      (this.state.peoplePerDiemRate * this.state.dataRate) + 
+      (this.state.peoplePerDiemFood * this.state.dataMeals));
   }
 
   async handleNumSupporters(event){
