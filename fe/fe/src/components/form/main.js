@@ -136,13 +136,31 @@ class Main extends React.Component {
     //"peopleCommercialAir", "peopleCommercialMilitary", "governmentLodging", 
     //"commercialLodging", "woodsLodging", "peopleperdiemRate", "peopleperdiemFood", "total"]
 
-    // await axios.post("https://hackathon-pacaf.thecosmoking.repl.co/api/archive_save", {
-    //   body: {
-    //     exerciseName: this.state.inputs.exerciseName,
-    //     supporters: this.state.totalAmountSupports,
-    //     fromLocation: this.state.input.
-    //   }
-    // });
+    await axios.post("https://hackathon-pacaf.thecosmoking.repl.co/api/archive_save", {
+      body: {
+        exerciseName: this.state.inputs.exerciseName,
+        supporters: this.state.totalAmountSupports,
+        fromLocation: this.state.inputs.departureCity,
+        toLocation: this.state.inputs.arrivalCity,
+        startDate: this.state.inputs.departureDate,
+        endDate: this.state.inputs.arrivalDate,
+        flightCost: this.state.flightCost,
+        dataMeals: this.state.dataMeals,
+        dataRate: this.state.dataRate,
+        peopleCommercialAir: this.state.peopleCommercialAir,
+        peopleCommercialMilitary: this.state.peopleMilitaryAir,
+        governmentLodging: this.state.peopleGovernmentLodging,
+        commercialLodging: this.state.peopleCommercialLodging,
+        woodsLodging: this.state.peopleWoodsLodging,
+        peopleperdiemRate: this.state.peoplePerDiemRate,
+        peopleperdiemFood: this.state.peoplePerDiemFood,
+        total: this.state.totalSum
+      }
+    }).then((response) => {
+      console.log(response);
+    }).catch((error) => {
+      console.log(error);
+    })
 
   }
 
@@ -164,6 +182,8 @@ class Main extends React.Component {
 
   async handleNumSupporters(event){
     const { name, value, type, checked } = event.target;
+
+    console.log("here");
 
     if (value >= this.state.minAmountSupporters)
       await this.setState({totalAmountSupports: value});
