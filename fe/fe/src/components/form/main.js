@@ -11,10 +11,29 @@ class Main extends React.Component {
       missingfields: false,
       formData: [],
       minAmountSupporters: 0,
+
+      exerciseName: "",
+
+      fromLocation: "",
+      startDate: "",
+
+      toLocation: "",
+      endDate: "",
+
+      peopleCommercialAir: 0,
+      peopleMilitaryAir: 0,
+
+      peopleGovernmentLodging: 0,
+      peopleCommercialLodging: 0,
+      peopleWoodsLodging: 0,
+
+      peoplePerDiemRate: 0,
+      peoplePerDiemFood: 0
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleAmount = this.handleAmount.bind(this);
+    this.onComplete = this.onComplete.bind(this);
   }
 
   async componentDidMount() {
@@ -32,7 +51,21 @@ class Main extends React.Component {
       });
   }
 
-  onComplete() {
+  onComplete(event) {
+    event.preventDefault();
+    console.log(this.state.inputs);
+    console.log(this.state.formData);
+    console.log(this.state.minAmountSupporters);
+
+    console.log(this.state.peopleCommercialAir);
+    console.log(this.state.peopleMilitaryAir);
+
+    console.log(this.state.peopleCommercialLodging);
+    console.log(this.state.peopleGovernmentLodging);
+    console.log(this.state.peopleWoodsLodging);
+
+    console.log(this.state.peoplePerDiemRate);
+    console.log(this.state.peoplePerDiemFood);
 
   }
 
@@ -111,6 +144,10 @@ class Main extends React.Component {
     }
   };
 
+  handleInputAmount = (event) => {
+    const { name, value } = event.target;
+    this.setState({ [name]: value });
+  };
 
   async toggleDropdown() {
     var dropdownContent = document.getElementById("dropdown-content");
@@ -121,7 +158,7 @@ class Main extends React.Component {
     return (
       <div className='Form'>
         <h1 className='Title'>PACAF Calculator</h1>
-        <form onSubmit={this.handleSubmit}>
+        <form onSubmit={this.onComplete}>
 
           <br />
           <label className='exerciseName'>
@@ -254,33 +291,42 @@ class Main extends React.Component {
             Number of Supporters:<p className='required-star'>*</p>
             <input type="number" name="numOfSupporters" value={this.state.minAmountSupporters} onChange={this.handleChange} />
           </label>
-          <br />
+
           <label className='airfare'>
-            Airfare Type:<p className='required-star'>*</p>
-            <select value={this.state.inputs.flyOption} name="flyOption" onChange={this.handleChange}>
-              <option value="">-- Select --</option>
-              <option value="militaryAir">Military Air</option>
-              <option value="commercialAir">Commercial Air</option>
-            </select>
+
+            <br/>
+            Amount in Military Air:<p className='required-star'>*</p>
+            <input type="number" name="peopleMilitaryAir" value={this.state.peopleMilitaryAir} onChange={this.handleInputAmount}/>
+
+            Amount in Commercial Air:<p className='required-star'>*</p>
+            <input type="number" name="peopleCommercialAir" value={this.state.peopleCommercialAir} onChange={this.handleInputAmount}/>
           </label>
 
 
 
-          <br />
+
           <label className='lodging'>
-            Lodging:<p className='required-star'>*</p>
-            <select value={this.state.inputs.lodging} name="lodging" onChange={this.handleChange}>
-              <option value="">-- Select --</option>
-              <option value="govLodging">Government Lodging</option>
-              <option value="commLodging">Commercial Hotel Lodging</option>
-              <option value="fieldConditions">Field Conditions</option>
-            </select>
+
+            <br/>
+            Amount in government lodging:<p className='required-star'>*</p>
+            <input type="number" name="peopleGovernmentLodging" value={this.state.peopleGovernmentLodging} onChange={this.handleInputAmount}/>
+
+            Amount in commercial hotel lodging:<p className='required-star'>*</p>
+            <input type="number" name="peopleCommercialLodging" value={this.state.peopleCommercialLodging} onChange={this.handleInputAmount}/>
+
+            Amount in field conditions:<p className='required-star'>*</p>
+            <input type="number" name="peopleWoodsLodging" value={this.state.peopleWoodsLodging} onChange={this.handleInputAmount}/>
           </label>
 
 
           <label>
-            Government Provied Meals
-            <input type="checkbox" checked={this.state.inputs.mealProvided} onChange={this.handleChange} />
+            
+            <br/>
+            Amount in per diem rate:<p className='required-star'>*</p>
+            <input type="number" name="peoplePerDiemRate" value={this.state.peoplePerDiemRate} onChange={this.handleInputAmount}/>
+
+            Amount in per diem food:<p className='required-star'>*</p>
+            <input type="number" name="peoplePerDiemFood" value={this.state.peoplePerDiemFood} onChange={this.handleInputAmount}/>
           </label>
 
           {this.state.missingfields && <p className='missingFields'>Please Fill Out All Required Fields</p>}
