@@ -227,6 +227,16 @@ def login():
     return jsonify({"success": False, "reason": "invalid"}), 400
   except:
     return jsonify({"success": False, "reason": "server_error"}), 500
+
+@app.route("/api/validate") # ROUTE COMPLETE
+def validate():
+  try:
+    existing = accountscoll.find_one({"token": request.cookies.get("token")})
+    if existing != None:
+      return jsonify({"success": True, "reason": "valid_token"}), 200
+    return jsonify({"success": False, "reason": "invalid_token"}), 400
+  except:
+    return jsonify({"success": False, "reason": "server_error"}), 500
       
 
   
