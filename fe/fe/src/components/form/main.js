@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './main.css'; // Import the CSS file
 import axios from 'axios'
+import swal from 'sweetalert2';
 
 const cities = [
   { name: 'Tucson', state: 'AZ' },
@@ -157,9 +158,9 @@ class Main extends React.Component {
         total: this.state.totalSum
       }
     }).then((response) => {
-      console.log(response);
+      swal.fire("Uploaded");
     }).catch((error) => {
-      console.log(error);
+      swal.fire("Did not upload");
     })
 
   }
