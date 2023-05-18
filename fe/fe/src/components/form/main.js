@@ -22,6 +22,7 @@ class Main extends React.Component {
       inputs: {},
       missingfields: false,
       minAmountSupporters: 0,
+      totalAmountSupports: 0,
 
       exerciseName: "",
 
@@ -50,6 +51,7 @@ class Main extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleAmount = this.handleAmount.bind(this);
     this.onComplete = this.onComplete.bind(this);
+    this.handleNumSupporters = this.handleNumSupporters.bind(this);
   }
 
   async componentDidMount() {
@@ -129,8 +131,14 @@ class Main extends React.Component {
 
   }
 
-  handleChange(event) {
+  async handleNumSupporters(event){
+    const { name, value, type, checked } = event.target;
 
+    if (value >= this.state.minAmountSupporters)
+      await this.setState({totalAmountSupports: value});
+  }
+
+  handleChange(event) {
     const { name, value, type, checked } = event.target;
     if (name === 'aircraftType') {
       const inputsCopy = JSON.parse(JSON.stringify(this.state.inputs));
@@ -161,11 +169,15 @@ class Main extends React.Component {
     }));
 
     const aircraftName = name.substring(0, name.length - 6);
-    this.state.aircrafts.map((aircraft, i) => {
+    this.state.aircrafts.map( async (aircraft, i) => {
       if (aircraft.type === aircraftName) {
-        this.setState({ minAmountSupporters: this.state.minAmountSupporters + aircraft.personnel[value - 1] });
+        await this.setState({ minAmountSupporters: this.state.minAmountSupporters + aircraft.personnel[value - 1] });
+        await this.setState({ totalAmountSupports: this.state.minAmountSupporters});
       }
     })
+
+    console.log("total amount: ", this.state.totalAmountSupports);
+    console.log("min amount: ", this.state.minAmountSupporters);
   }
 
 
@@ -349,7 +361,7 @@ class Main extends React.Component {
 
           <label className='supporters'>
             Number of Supporters:<p className='required-star'>*</p>
-            <input type="number" name="numOfSupporters" value={this.state.minAmountSupporters} onChange={this.handleChange} />
+            <input type="number" name="numOfSupporters" value={this.state.totalAmountSupports} onChange={this.handleNumSupporters} />
           </label>
 
           <label className='airfare'>
