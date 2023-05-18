@@ -21,7 +21,6 @@ class Main extends React.Component {
       aircrafts: [],
       inputs: {},
       missingfields: false,
-      formData: [],
       minAmountSupporters: 0,
 
       exerciseName: "",
@@ -31,6 +30,11 @@ class Main extends React.Component {
 
       toLocation: "",
       endDate: "",
+
+      flightCost: 0,
+
+      dataMeals: 0,
+      dataRate: 0,
 
       peopleCommercialAir: 0,
       peopleMilitaryAir: 0,
@@ -88,7 +92,7 @@ class Main extends React.Component {
         round: true
       }
     }).then((response) => {
-      this.state.formData[0] = response.data.flight.cost;
+      this.state.flightCost = response.data.flight.cost;
     }).catch((error) => {
       console.log("error: ", error);
     });
@@ -99,8 +103,8 @@ class Main extends React.Component {
         location: this.state.inputs.arrivalCity
       }
     }).then((response) => {
-      this.state.formData[1] = response.data.meals;
-      this.state.formData[2] = response.data.rate;
+      console.log(this.state.inputs.arrivalCity);
+      console.log(response.data);
     }).catch((error) => {
       console.log("error: ", error);
     });
@@ -114,12 +118,14 @@ class Main extends React.Component {
         city: this.state.inputs.arrivalCity
       }
     }).then((response) => {
-      this.state.formData[3] = response.data.hotels[0];
-      this.state.formData[4] = response.data.hotels[1];
-      this.state.formData[5] = response.data.hotels[2];
+      this.state.dataMeals = response.data.meals;
+      this.state.dataRate = response.data.rate;
     }).catch((error) => {
       console.log("error: ", error);
     });
+
+
+    console.log(this.state);
 
   }
 
