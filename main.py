@@ -31,9 +31,9 @@ lodgingcoll = mongoclient["Lodging-table"]
 @app.route("/api/archive_save", methods=["POST"])
 def saveToArchive():
   try:
-    account = accountscoll.find_one({"token": request.cookies.get("token")})
-    if account == None:
-      return jsonify({"success": False, "reason": "unauthorized"}), 401
+    #account = accountscoll.find_one({"token": request.cookies.get("token")})
+    #if account == None:
+      #return jsonify({"success": False, "reason": "unauthorized"}), 401
     while True:
       id = ""
       for num in range(6):
@@ -41,19 +41,21 @@ def saveToArchive():
       if archivecoll.find_one({"uid": id}) == None:
         break
     archived = {"id": id}
-    variables = ["exerciseName", "supporters", "fromLocation", "toLocation", "startDate", "endDate", "flightCost", "dataMeals", "dataRate", "peopleCommercialAir", "peopleCommercialMilitary", "governmentLodging", "commercialLodging", "woodsLodging", "peopleperdiemRate", "peopleperdiemFood"]
+    variables = ["exerciseName", "supporters", "fromLocation", "toLocation", "startDate", "endDate", "flightCost", "dataMeals", "dataRate", "peopleCommercialAir", "peopleCommercialMilitary", "governmentLodging", "commercialLodging", "woodsLodging", "peopleperdiemRate", "peopleperdiemFood", "total"]
     for v in variables:
-      item = request.json.get(v)
+      item = request.json["body"].get(v)
       if item == None:
         return jsonify({"success": False, "reason": f"missing_{v}"}), 400
-      if len(item) < 1 or len(item) > 50:
+      if len(str(item)) < 1 or len(str(item)) > 50:
         return jsonify({"success": False, "reason": f"invalid_{v}"}), 400
-      if item.isnumeric():
+      if isinstance(item, str) and item.isnumeric():
         item = int(item)
       archived[v] = item
+    archived["createdAt"] = datetime.datetime.now().strftime("%Y-%m-%d")
     archivecoll.insert_one(archived)
     return jsonify({"success": True, "reason": "none"})
-  except:
+  except Exception as e:
+    print(e)
     return jsonify({"success": False, "reason": "server_error"}), 500
 
 @app.route("/api/archive")
@@ -99,18 +101,19 @@ def drafts():
 def archive():
   try:
     account = accountscoll.find_one({"token": request.cookies.get("token")})
-    if account == None:
-      return jsonify({"success": False, "reason": "unauthorized"}), 401
+    #if account == None:
+      #return jsonify({"success": False, "reason": "unauthorized"}), 401
     archive = {"success": True, "reason": "none", "archive": []}
     for finished in archivecoll.find({}, {"_id": 0}):
-      if finished["owner"] == account["uid"]:
-        archive["archive"].append(finished)
+      #if finished["owner"] == account["uid"]:
+      archive["archive"].append(finished)
     if len(archive["archive"]) != 0:
       archive["archive"] = sorted(archive["archive"], key=lambda e:e["createdAt"], reverse=True)
     else:
       archive["archive"] = ["none"]
     return jsonify(archive), 200
-  except:
+  except Exception as e:
+    print(e)
     return jsonify({"success": False, "reason": "server_error"}), 500
     
 @app.route("/api/empty_archive", methods=["POST"]) # ROUTE COMPLETE
@@ -224,6 +227,7 @@ def login():
     return jsonify({"success": False, "reason": "server_error"}), 500
       
 
+  
 """
 -- AIRCRAFT ROUTES --
 """
