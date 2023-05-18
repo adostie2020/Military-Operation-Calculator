@@ -279,7 +279,7 @@ class Main extends React.Component {
 
 
           <label>
-            Meal Provided:
+            Government Provied Meals
             <input type="checkbox" checked={this.state.inputs.mealProvided} onChange={this.handleChange} />
           </label>
 
