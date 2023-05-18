@@ -67,10 +67,10 @@ class Main extends React.Component {
       },
     }));
 
-    const aircraftName = name.substring(0, name.length-6);
+    const aircraftName = name.substring(0, name.length - 6);
     this.state.aircrafts.map((aircraft, i) => {
-      if (aircraft.type === aircraftName){
-        this.setState({minAmountSupporters: this.state.minAmountSupporters + aircraft.personnel[value-1]});
+      if (aircraft.type === aircraftName) {
+        this.setState({ minAmountSupporters: this.state.minAmountSupporters + aircraft.personnel[value - 1] });
       }
     })
   }
@@ -98,31 +98,7 @@ class Main extends React.Component {
     let noneSelected = true;
     let run = true;
     while (run) {
-      if (this.state.inputs["A-10"]) {
-        noneSelected = false;
-        break;
-      }
-      else if (this.state.inputs["C-5"]) {
-        noneSelected = false;
-        break;
-      }
-      else if (this.state.inputs["C-17"]) {
-        noneSelected = false;
-        break;
-      }
-      else if (this.state.inputs["C-130"]) {
-        noneSelected = false;
-        break;
-      }
-      else if (this.state.inputs["F-15C"]) {
-        noneSelected = false;
-        break;
-      }
-      else if (this.state.inputs["F-22"]) {
-        noneSelected = false;
-        break;
-      }
-      else if (this.state.inputs["KC-135"]) {
+      if (this.state.inputs["A-10"] || this.state.inputs["C-5"] || this.state.inputs["C-17"] || this.state.inputs["C-130"] || this.state.inputs["F-15C"] || this.state.inputs["F-22"] || this.state.inputs["KC-135"]) {
         noneSelected = false;
         break;
       }
