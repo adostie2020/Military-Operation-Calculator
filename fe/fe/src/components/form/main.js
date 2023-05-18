@@ -2,6 +2,18 @@ import React, { useState } from 'react';
 import './main.css'; // Import the CSS file
 import axios from 'axios'
 
+const cities = [
+  { name: 'Tucson', state: 'AZ' },
+  { name: 'Los Angeles', state: 'CA' },
+  { name: 'Miami', state: 'FL' },
+  // Add more city-state mappings as needed
+];
+
+function getStateAbbreviation(cityName) {
+  const city = cities.find(c => c.name.toLowerCase() === cityName.toLowerCase());
+  return city ? city.state : null;
+}
+
 class Main extends React.Component {
   constructor(props) {
     super(props);
@@ -66,6 +78,47 @@ class Main extends React.Component {
 
     console.log(this.state.peoplePerDiemRate);
     console.log(this.state.peoplePerDiemFood);
+
+    //https://hackathon-pacaf--thecosmoking.repl.co/api/flight_details?from=TUCSON&to=LAX&date=2023-05-23&round=True
+    axios.get("https://hackathon-pacaf--thecosmoking.repl.co/api/flight_details", {
+      params: {
+        from: this.state.inputs.departureCity,
+        to: this.state.inputs.arrivalCity,
+        date: this.state.inputs.arrivalDate,
+        round: true
+      }
+    }).then((response) => {
+      this.state.formData[0] = response.data.flight.cost;
+    }).catch((error) => {
+      console.log("error: ", error);
+    });
+
+    ///api/hotels?code={iata code}
+    axios.get("https://hackathon-pacaf--thecosmoking.repl.co/api/hotels", {
+      params: {
+        location: this.state.inputs.arrivalCity
+      }
+    }).then((response) => {
+      console.log(response);
+      this.state.formData[1] = response.data.meals;
+      this.state.formData[2] = response.data.rate;
+    }).catch((error) => {
+      console.log("error: ", error);
+    });
+
+    ///api/pdrates?year={YEAR}&month={MONTH IN 01/02/03/04 format}&state={STATE CODE (AZ/CA/FL, etc)}&city={CITY NAME}
+    axios.get("https://hackathon-pacaf--thecosmoking.repl.co/api/pdrates", {
+      params: {
+        year: this.state.inputs.arrivalDate.substring(0, 4),
+        month: this.state.inputs.arrivalDate.substring(5, 7),
+        state: getStateAbbreviation(this.state.inputs.arrivalCity),
+        city: this.state.inputs.arrivalCity
+      }
+    }).then((response) => {
+      console.log(response);
+    }).catch((error) => {
+      console.log("error: ", error);
+    });
 
   }
 

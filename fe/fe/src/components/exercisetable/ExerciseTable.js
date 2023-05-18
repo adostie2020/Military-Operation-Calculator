@@ -47,7 +47,7 @@ class TheExerciseTable extends React.Component {
                     console.log("post request success: ", response.data);
                     window.location.reload();
                 }).catch((error) => {
-                    console.log("error alv: ", error);
+                    console.log("error: ", error);
                 });
             }
         })
