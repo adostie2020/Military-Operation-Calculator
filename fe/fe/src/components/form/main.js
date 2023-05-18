@@ -99,7 +99,6 @@ class Main extends React.Component {
         location: this.state.inputs.arrivalCity
       }
     }).then((response) => {
-      console.log(response);
       this.state.formData[1] = response.data.meals;
       this.state.formData[2] = response.data.rate;
     }).catch((error) => {
@@ -115,7 +114,9 @@ class Main extends React.Component {
         city: this.state.inputs.arrivalCity
       }
     }).then((response) => {
-      console.log(response);
+      this.state.formData[3] = response.data.hotels[0];
+      this.state.formData[4] = response.data.hotels[1];
+      this.state.formData[5] = response.data.hotels[2];
     }).catch((error) => {
       console.log("error: ", error);
     });
