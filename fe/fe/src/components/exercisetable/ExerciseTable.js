@@ -1,6 +1,6 @@
 import React from 'react';
-import Swal from 'sweetalert2';
 import axios from 'axios';
+import './exercisetable.css'
 
 
 class TheExerciseTable extends React.Component {
@@ -10,47 +10,15 @@ class TheExerciseTable extends React.Component {
     }
 
     async componentDidMount() {
-        await axios.get('https://hackathon-pacaf--thecosmoking.repl.co/api/get_exercise')
+        await axios.get('https://hackathon-pacaf--thecosmoking.repl.co/api/get_archive')
           .then(response => {
-            this.setState({exercises: response.data.exercises});
+            this.setState({exercises: response.data.archive});
           })
           .catch(error => {
             console.error(error);
           });
-    }
 
-    swalfirestuff() {
-        Swal.fire({
-            title: 'Submit new exercise',
-            html:
-                '<input id="input1" class="swal2-input" placeholder="Enter exercise name">' +
-                '<input id="input2" class="swal2-input" placeholder="location">',
-            inputAttributes: {
-                autocapitalize: 'off'
-            },
-            showCancelButton: true,
-            confirmButtonText: 'Add',
-            showLoaderOnConfirm: true,
-            preConfirm: () => {
-                const newName = document.getElementById('input1').value;
-                const newLocation = document.getElementById('input2').value;
-
-                return {newName, newLocation};
-            }
-        }).then((result) => {
-            console.log(result);
-            if (result.isConfirmed){
-                axios.post('https://hackathon-pacaf--thecosmoking.repl.co/api/add_exercise', {
-                    name: result.value.newName,
-                    location: result.value.newLocation
-                }).then((response) => {
-                    console.log("post request success: ", response.data);
-                    window.location.reload();
-                }).catch((error) => {
-                    console.log("error: ", error);
-                });
-            }
-        })
+          console.log(this.state.exercises);
     }
 
     render() {
@@ -60,21 +28,22 @@ class TheExerciseTable extends React.Component {
                     <table>
                         <thead>
                             <tr>
-                                <th>Location</th>
                                 <th>Name</th>
+                                <th>Location</th>
+                                <th>Date Created</th>
                             </tr>
                         </thead>
                         <tbody>
                             {this.state.exercises.map((exercise) => (
                                 <tr key={exercise.id}>
-                                    <td>{exercise.location}</td>
-                                    <td>{exercise.name}</td>
+                                    <td>{exercise.exerciseName}</td>
+                                    <td>{exercise.toLocation}</td>
+                                    <td>{exercise.createdAt}</td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
-                <button onClick={() => this.swalfirestuff()}> enter new exercise</button>
             </div>
         );
     }
