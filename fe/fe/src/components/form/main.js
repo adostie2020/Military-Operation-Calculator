@@ -1,0 +1,465 @@
+import React, { useState } from 'react';
+import './main.css'; // Import the CSS file
+import axios from 'axios'
+import swal from 'sweetalert2';
+
+const cities = [
+  { name: 'Tucson', state: 'AZ' },
+  { name: 'Los Angeles', state: 'CA' },
+  { name: 'Miami', state: 'FL' },
+  // Add more city-state mappings as needed
+];
+
+function getStateAbbreviation(cityName) {
+  const city = cities.find(c => c.name.toLowerCase() === cityName.toLowerCase());
+  return city ? city.state : null;
+}
+
+class Main extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      aircrafts: [],
+      inputs: {},
+      missingfields: false,
+      minAmountSupporters: 0,
+      totalAmountSupports: 0,
+      totalSum: 0,
+
+      exerciseName: "",
+
+      fromLocation: "",
+      startDate: "",
+
+      toLocation: "",
+      endDate: "",
+
+      flightCost: 0,
+
+      dataMeals: 0,
+      dataRate: 0,
+
+      peopleCommercialAir: 0,
+      peopleMilitaryAir: 0,
+
+      peopleGovernmentLodging: 0,
+      peopleCommercialLodging: 0,
+      peopleWoodsLodging: 0,
+
+      peoplePerDiemRate: 0,
+      peoplePerDiemFood: 0
+    };
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleAmount = this.handleAmount.bind(this);
+    this.onComplete = this.onComplete.bind(this);
+    this.handleNumSupporters = this.handleNumSupporters.bind(this);
+  }
+
+  async componentDidMount() {
+    await axios.get('https://hackathon-pacaf--thecosmoking.repl.co/api/get_aircraft')
+      .then(response => {
+        this.setState({ aircrafts: response.data.aircrafts });
+        const newInputs = {};
+        for (let i = 0; i < response.data.aircrafts.length; i++) {
+          newInputs[response.data.aircrafts[i].type] = false;
+        }
+        this.setState({ inputs: newInputs })
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  }
+
+  async onComplete(event) {
+    event.preventDefault();
+    console.log(this.state.inputs);
+    console.log(this.state.formData);
+    console.log(this.state.minAmountSupporters);
+
+    console.log(this.state.peopleCommercialAir);
+    console.log(this.state.peopleMilitaryAir);
+
+    console.log(this.state.peopleCommercialLodging);
+    console.log(this.state.peopleGovernmentLodging);
+    console.log(this.state.peopleWoodsLodging);
+
+    console.log(this.state.peoplePerDiemRate);
+    console.log(this.state.peoplePerDiemFood);
+
+    //https://hackathon-pacaf--thecosmoking.repl.co/api/flight_details?from=TUCSON&to=LAX&date=2023-05-23&round=True
+    await axios.get("https://hackathon-pacaf--thecosmoking.repl.co/api/flight_details", {
+      params: {
+        from: this.state.inputs.departureCity,
+        to: this.state.inputs.arrivalCity,
+        date: this.state.inputs.arrivalDate,
+        round: true
+      }
+    }).then((response) => {
+      this.state.flightCost = response.data.flight.cost;
+    }).catch((error) => {
+      console.log("error: ", error);
+    });
+
+    ///api/hotels?code={iata code}
+    await axios.get("https://hackathon-pacaf--thecosmoking.repl.co/api/hotels", {
+      params: {
+        location: this.state.inputs.arrivalCity
+      }
+    }).then((response) => {
+      console.log(this.state.inputs.arrivalCity);
+      console.log(response.data);
+    }).catch((error) => {
+      console.log("error: ", error);
+    });
+
+    ///api/pdrates?year={YEAR}&month={MONTH IN 01/02/03/04 format}&state={STATE CODE (AZ/CA/FL, etc)}&city={CITY NAME}
+    await axios.get("https://hackathon-pacaf--thecosmoking.repl.co/api/pdrates", {
+      params: {
+        year: this.state.inputs.arrivalDate.substring(0, 4),
+        month: this.state.inputs.arrivalDate.substring(5, 7),
+        state: getStateAbbreviation(this.state.inputs.arrivalCity),
+        city: this.state.inputs.arrivalCity
+      }
+    }).then((response) => {
+      this.state.dataMeals = response.data.meals;
+      this.state.dataRate = response.data.rate;
+    }).catch((error) => {
+      console.log("error: ", error);
+    });
+
+
+    await this.doMath();
+    console.log(this.state.totalSum)
+
+    //["exerciseName", "supporters", "fromLocation", "toLocation", 
+    //"startDate", "endDate", "flightCost", "dataMeals", "dataRate", 
+    //"peopleCommercialAir", "peopleCommercialMilitary", "governmentLodging", 
+    //"commercialLodging", "woodsLodging", "peopleperdiemRate", "peopleperdiemFood", "total"]
+
+    await axios.post("https://hackathon-pacaf.thecosmoking.repl.co/api/archive_save", {
+      body: {
+        exerciseName: this.state.inputs.exerciseName,
+        supporters: this.state.totalAmountSupports,
+        fromLocation: this.state.inputs.departureCity,
+        toLocation: this.state.inputs.arrivalCity,
+        startDate: this.state.inputs.departureDate,
+        endDate: this.state.inputs.arrivalDate,
+        flightCost: this.state.flightCost,
+        dataMeals: this.state.dataMeals,
+        dataRate: this.state.dataRate,
+        peopleCommercialAir: this.state.peopleCommercialAir,
+        peopleCommercialMilitary: this.state.peopleMilitaryAir,
+        governmentLodging: this.state.peopleGovernmentLodging,
+        commercialLodging: this.state.peopleCommercialLodging,
+        woodsLodging: this.state.peopleWoodsLodging,
+        peopleperdiemRate: this.state.peoplePerDiemRate,
+        peopleperdiemFood: this.state.peoplePerDiemFood,
+        total: this.state.totalSum
+      }
+    }).then((response) => {
+      swal.fire("Uploaded");
+    }).catch((error) => {
+      swal.fire("Did not upload");
+    })
+
+  }
+
+  async doMath(){
+    console.log("people in commercial air: ", this.state.peopleCommercialAir);
+    console.log("flight cost: ", this.state.flightCost);
+    console.log();
+
+    console.log("people in perdiemrate: ", this.state.peoplePerDiemRate);
+    console.log("perdiemrate: ", this.state.dataRate);
+    console.log();
+
+    console.log("people in perdiemfood: ", this.state.peoplePerDiemFood);
+    console.log(this.state.dataMeals);
+    this.state.totalSum = ((this.state.peopleCommercialAir * this.state.flightCost) + 
+      (this.state.peoplePerDiemRate * this.state.dataRate) + 
+      (this.state.peoplePerDiemFood * this.state.dataMeals));
+  }
+
+  async handleNumSupporters(event){
+    const { name, value, type, checked } = event.target;
+
+    console.log("here");
+
+    if (value >= this.state.minAmountSupporters)
+      await this.setState({totalAmountSupports: value});
+  }
+
+  handleChange(event) {
+    const { name, value, type, checked } = event.target;
+    if (name === 'aircraftType') {
+      const inputsCopy = JSON.parse(JSON.stringify(this.state.inputs));
+      inputsCopy[value] = checked;
+      this.setState({ inputs: inputsCopy });
+      //this.setState(this.state.inputs[value] = checked)
+      this.state.inputs[value] = checked;
+      console.log("Checking for " + value + " it is " + this.state.inputs[value]);
+    }
+    else {
+      this.setState((prevState) => ({
+        inputs: {
+          ...prevState.inputs,
+          [name]: value,
+        },
+      }));
+    }
+  };
+
+  async handleAmount(event) {
+    const { name, value, type, checked } = event.target;
+
+    await this.setState((prevState) => ({
+      inputs: {
+        ...prevState.inputs,
+        [name]: parseInt(value),
+      },
+    }));
+
+    const aircraftName = name.substring(0, name.length - 6);
+    this.state.aircrafts.map( async (aircraft, i) => {
+      if (aircraft.type === aircraftName) {
+        await this.setState({ minAmountSupporters: this.state.minAmountSupporters + aircraft.personnel[value - 1] });
+        await this.setState({ totalAmountSupports: this.state.minAmountSupporters});
+      }
+    })
+
+    console.log("total amount: ", this.state.totalAmountSupports);
+    console.log("min amount: ", this.state.minAmountSupporters);
+  }
+
+
+
+  handleSubmit(event) {
+
+    event.preventDefault();
+    const requiredFields = ['exerciseName', 'departureCity', 'departureDate', 'arrivalCity', 'arrivalDate', 'numOfSupporters', 'flyOption', 'lodging'];
+
+    const hasValue = (obj) => {
+      if (typeof obj === 'object' && obj !== null) {
+        for (const key in obj) {
+          if (!hasValue(obj[key])) {
+            return false;
+          }
+        }
+        return true;
+      } else {
+        return obj !== undefined && obj !== null && obj !== '';
+      }
+    };
+    const inputMissingFields = requiredFields.filter(field => !hasValue(this.state.inputs[field]));
+    let noneSelected = true;
+    let run = true;
+    while (run) {
+      if (this.state.inputs["A-10"] || this.state.inputs["C-5"] || this.state.inputs["C-17"] || this.state.inputs["C-130"] || this.state.inputs["F-15C"] || this.state.inputs["F-22"] || this.state.inputs["KC-135"]) {
+        noneSelected = false;
+        break;
+      }
+      run = false;
+    }
+    this.setState({ missingfields: false });
+    if (inputMissingFields.length > 0 || noneSelected) {
+      this.setState({ missingfields: true }, () => {
+      })
+    }
+  };
+
+  handleInputAmount = (event) => {
+    const { name, value } = event.target;
+    this.setState({ [name]: value });
+  };
+
+  async toggleDropdown() {
+    var dropdownContent = document.getElementById("dropdown-content");
+    dropdownContent.style.display = dropdownContent.style.display === "none" ? "block" : "none";
+  }
+
+  render() {
+    return (
+      <div className='Form'>
+        <h1 className='Title'>PACAF Calculator</h1>
+        <form onSubmit={this.onComplete}>
+
+          <br />
+          <label className='exerciseName'>
+            Exercise Name:<p className='required-star'>*</p>
+            <input type="text" name="exerciseName" value={this.state.inputs.exerciseName || ''} onChange={this.handleChange} />
+          </label>
+
+          <label className='departureCity'>
+            From:<p className='required-star'>*</p>
+            <input type="text" name="departureCity" value={this.state.inputs.departureCity || ''} onChange={this.handleChange} />
+          </label>
+          <label className='departureDate'>
+            Select a Date:<p className='required-star'>*</p>
+            <input type="date" name="departureDate" value={this.state.inputs.departureDate} onChange={this.handleChange} />
+          </label>
+          <br />
+          <label className='arrivalCity'>
+            To:<p className='required-star'>*</p>
+            <input type="text" name="arrivalCity" value={this.state.inputs.arrivalCity || ''} onChange={this.handleChange} />
+          </label>
+          <label className='arrivalDate'>
+            Select a Date:<p className='required-star'>*</p>
+            <input type="date" name="arrivalDate" value={this.state.inputs.arrivalDate} onChange={this.handleChange} />
+          </label>
+          <br />
+
+          <label className='aircraftType'>
+            Aircraft Type:<p className='required-star'>*</p>
+            <div className="dropdown">
+              <button className="dropdown-toggle" onClick={this.toggleDropdown} type="button">Select Aircraft Type</button>
+              <div id="dropdown-content" className="dropdown-content">
+                <label>
+                  <input
+                    type="checkbox"
+                    value="F-22"
+                    name="aircraftType"
+                    onChange={this.handleChange}
+                    checked={this.state.inputs.aircraftType && this.state.inputs.aircraftType.includes("F-22")}
+                  />
+                  F-22
+                  {this.state.inputs["F-22"] && <input
+                    type="number" name="F-22Amount" onChange={this.handleAmount} />
+                  }
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    value="A-10"
+                    name="aircraftType"
+                    onChange={this.handleChange}
+                    checked={this.state.inputs.aircraftType && this.state.inputs.aircraftType.includes("A-10")}
+                  />
+                  A-10
+                  {this.state.inputs["A-10"] && <input
+                    type="number" name="A-10Amount" onChange={this.handleAmount} />
+                  }
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    value="C-5"
+                    name="aircraftType"
+                    onChange={this.handleChange}
+                    checked={this.state.inputs.aircraftType && this.state.inputs.aircraftType.includes("C-5")}
+                  />
+                  C-5
+                  {this.state.inputs["C-5"] && <input
+                    type="number" name="C-5Amount" onChange={this.handleAmount} />
+                  }
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    value="C-17"
+                    name="aircraftType"
+                    onChange={this.handleChange}
+                    checked={this.state.inputs.aircraftType && this.state.inputs.aircraftType.includes("C-17")}
+                  />
+                  C-17
+                  {this.state.inputs["C-17"] && <input
+                    type="number" name="C-17Amount" onChange={this.handleAmount} />
+                  }
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    value="C-130"
+                    name="aircraftType"
+                    onChange={this.handleChange}
+                    checked={this.state.inputs.aircraftType && this.state.inputs.aircraftType.includes("C-130")}
+                  />
+                  C-130
+                  {this.state.inputs["C-130"] && <input
+                    type="number" name="C-130Amount" onChange={this.handleAmount} />
+                  }
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    value="F-15C"
+                    name="aircraftType"
+                    onChange={this.handleChange}
+                    checked={this.state.inputs.aircraftType && this.state.inputs.aircraftType.includes("F-15C")}
+                  />
+                  F-15C
+                  {this.state.inputs["F-15C"] && <input
+                    type="number" name="F-15CAmount" onChange={this.handleAmount} />
+                  }
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    value="KC-135"
+                    name="aircraftType"
+                    onChange={this.handleChange}
+                    checked={this.state.inputs.aircraftType && this.state.inputs.aircraftType.includes("KC-135")}
+                  />
+                  KC-135
+                  {this.state.inputs["KC-135"] && <input
+                    type="number" name="KC-135Amount" onChange={this.handleAmount} />
+                  }
+                </label>
+              </div>
+            </div>
+          </label>
+
+
+
+          <label className='supporters'>
+            Number of Supporters:<p className='required-star'>*</p>
+            <input type="number" name="numOfSupporters" value={this.state.totalAmountSupports} onChange={this.handleNumSupporters} />
+          </label>
+
+          <label className='airfare'>
+
+            <br/>
+            Amount in Military Air:<p className='required-star'>*</p>
+            <input type="number" name="peopleMilitaryAir" value={this.state.peopleMilitaryAir} onChange={this.handleInputAmount}/>
+
+            Amount in Commercial Air:<p className='required-star'>*</p>
+            <input type="number" name="peopleCommercialAir" value={this.state.peopleCommercialAir} onChange={this.handleInputAmount}/>
+          </label>
+
+
+
+
+          <label className='lodging'>
+
+            <br/>
+            Amount in government lodging:<p className='required-star'>*</p>
+            <input type="number" name="peopleGovernmentLodging" value={this.state.peopleGovernmentLodging} onChange={this.handleInputAmount}/>
+
+            Amount in commercial hotel lodging:<p className='required-star'>*</p>
+            <input type="number" name="peopleCommercialLodging" value={this.state.peopleCommercialLodging} onChange={this.handleInputAmount}/>
+
+            Amount in field conditions:<p className='required-star'>*</p>
+            <input type="number" name="peopleWoodsLodging" value={this.state.peopleWoodsLodging} onChange={this.handleInputAmount}/>
+          </label>
+
+
+          <label>
+            
+            <br/>
+            Amount in per diem rate:<p className='required-star'>*</p>
+            <input type="number" name="peoplePerDiemRate" value={this.state.peoplePerDiemRate} onChange={this.handleInputAmount}/>
+
+            Amount in per diem food:<p className='required-star'>*</p>
+            <input type="number" name="peoplePerDiemFood" value={this.state.peoplePerDiemFood} onChange={this.handleInputAmount}/>
+          </label>
+
+          {this.state.missingfields && <p className='missingFields'>Please Fill Out All Required Fields</p>}
+          <br />
+          <button className="calculate" type="submit">Calculate</button>
+        </form>
+      </div>
+    );
+  };
+}
+
+export default Main;
