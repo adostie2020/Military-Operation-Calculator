@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './main.css'; // Import the CSS file
 import axios from 'axios'
 import swal from 'sweetalert2';
+import PDFGenerator from '../jspdf/createPDF';
 
 const cities = [
   { name: 'Tucson', state: 'AZ' },
@@ -159,7 +160,9 @@ class Main extends React.Component {
       }
     }).then((response) => {
       swal.fire("Uploaded");
+      PDFGenerator(this.state);
     }).catch((error) => {
+      console.log(error);
       swal.fire("Did not upload");
     })
 
@@ -177,7 +180,6 @@ class Main extends React.Component {
     console.log("people in perdiemfood: ", this.state.peoplePerDiemFood);
     console.log(this.state.dataMeals);
     this.state.totalSum = ((this.state.peopleCommercialAir * this.state.flightCost) + 
-      (this.state.peoplePerDiemRate * this.state.dataRate) + 
       (this.state.peoplePerDiemFood * this.state.dataMeals));
   }
 
@@ -446,10 +448,7 @@ class Main extends React.Component {
           <label>
             
             <br/>
-            Amount in per diem rate:<p className='required-star'>*</p>
-            <input type="number" name="peoplePerDiemRate" value={this.state.peoplePerDiemRate} onChange={this.handleInputAmount}/>
-
-            Amount in per diem food:<p className='required-star'>*</p>
+            Amount in per diem meals:<p className='required-star'>*</p>
             <input type="number" name="peoplePerDiemFood" value={this.state.peoplePerDiemFood} onChange={this.handleInputAmount}/>
           </label>
 
