@@ -5,7 +5,7 @@ async function PDFGenerator(data){
     console.log(data);
 
     doc.text(data.inputs.exerciseName, 5, 10);
-    doc.text("$" + data.totalSum, 5, 15);
+    doc.text("$" + data.totalSum.toFixed(2), 5, 15);
 
     const fromTo = data.inputs.departureCity + " -> " + data.inputs.arrivalCity;
     const startFinish = data.inputs.departureDate + " : " + data.inputs.arrivalDate;
@@ -26,7 +26,7 @@ async function PDFGenerator(data){
 
             doc.text(name + ":", 5, yLoc);
             doc.text(supportersForAircraft.toString(), 25, yLoc);
-            doc.text("$"+totalAmountForAircraft.toString(), 45, yLoc);
+            doc.text("$"+totalAmountForAircraft.toFixed(2).toString(), 45, yLoc);
             i++;
         }
     });

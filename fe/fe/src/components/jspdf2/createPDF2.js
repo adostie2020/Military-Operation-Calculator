@@ -5,7 +5,7 @@ async function PDFGenerator2(data){
     console.log(data);
 
     doc.text(data.exerciseName, 5, 10);
-    doc.text("$" + data.total, 5, 15);
+    doc.text("$" + data.total.toFixed(2), 5, 15);
 
     const fromTo = data.fromLocation + " -> " + data.toLocation;
     const startFinish = data.startDate + " : " + data.endDate;

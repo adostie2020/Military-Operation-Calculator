@@ -74,6 +74,11 @@ class Main extends React.Component {
 
   async onComplete(event) {
     event.preventDefault();
+    swal.fire({
+      title: "Uploading",
+      icon: 'warning',
+      toast: true
+    });
     console.log(this.state.inputs);
     console.log(this.state.formData);
     console.log(this.state.minAmountSupporters);
@@ -159,11 +164,19 @@ class Main extends React.Component {
         total: this.state.totalSum
       }
     }).then((response) => {
-      swal.fire("Uploaded");
+      swal.fire({
+        title: "Successfully Uploaded, check pdf for results",
+        icon: 'success',
+        toast: true
+      });
       PDFGenerator(this.state);
     }).catch((error) => {
       console.log(error);
-      swal.fire("Did not upload");
+      swal.fire({
+        title: "Error Uploading",
+        icon: 'error',
+        toast: true
+      });
     })
 
   }
