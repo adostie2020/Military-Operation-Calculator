@@ -10,7 +10,7 @@ from duffel_api import Duffel
 from flask_cors import CORS #comment this on deployment
 from bs4 import BeautifulSoup
 from passlib.hash import sha256_crypt
-from flask import Flask, jsonify, request, make_response
+from flask import Flask, jsonify, request, make_response, send_from_directory
 
 
 app = Flask(__name__, static_folder="fe/fe/build", static_url_path="")
@@ -24,9 +24,11 @@ aircraftcoll = mongoclient["Aircraft-table"]
 exercisecoll = mongoclient["Exercise-table"]
 lodgingcoll = mongoclient["Lodging-table"]
 
+
 """
 -- DRAFTS AND ARCHIVE ROUTES --
 """
+
 
 @app.route("/api/archive_save", methods=["POST"])
 def saveToArchive():
@@ -40,7 +42,7 @@ def saveToArchive():
         id += str(random.randint(0, 9))
       if archivecoll.find_one({"uid": id}) == None:
         break
-    archived = {"id": id}
+    archived = {"id": int(id)}
     variables = ["exerciseName", "supporters", "fromLocation", "toLocation", "startDate", "endDate", "flightCost", "dataMeals", "dataRate", "peopleCommercialAir", "peopleCommercialMilitary", "governmentLodging", "commercialLodging", "woodsLodging", "peopleperdiemRate", "peopleperdiemFood", "total"]
     for v in variables:
       item = request.json["body"].get(v)
@@ -54,8 +56,7 @@ def saveToArchive():
     archived["createdAt"] = datetime.datetime.now().strftime("%Y-%m-%d")
     archivecoll.insert_one(archived)
     return jsonify({"success": True, "reason": "none"})
-  except Exception as e:
-    print(e)
+  except:
     return jsonify({"success": False, "reason": "server_error"}), 500
 
 @app.route("/api/archive")
@@ -112,8 +113,7 @@ def archive():
     else:
       archive["archive"] = ["none"]
     return jsonify(archive), 200
-  except Exception as e:
-    print(e)
+  except:
     return jsonify({"success": False, "reason": "server_error"}), 500
     
 @app.route("/api/empty_archive", methods=["POST"]) # ROUTE COMPLETE
@@ -225,6 +225,16 @@ def login():
     return jsonify({"success": False, "reason": "invalid"}), 400
   except:
     return jsonify({"success": False, "reason": "server_error"}), 500
+
+@app.route("/api/validate") # ROUTE COMPLETE
+def validate():
+  try:
+    existing = accountscoll.find_one({"token": request.cookies.get("token")})
+    if existing != None:
+      return jsonify({"success": True, "reason": "valid_token"}), 200
+    return jsonify({"success": False, "reason": "invalid_token"}), 400
+  except:
+    return jsonify({"success": False, "reason": "server_error"}), 500
       
 
   
@@ -239,7 +249,6 @@ def addAircraft():
     type = request.json.get("type")
     number = request.json.get("number")
     personnel = request.json.get("personnel")
-    print(personnel)
     existing = accountscoll.find_one({"token": request.cookies.get("token")})
     #if existing == None:
       #return jsonify({"success": False, "reason": "unauthorized"}), 401
@@ -422,13 +431,9 @@ def editExercise():
 @app.route("/api/flight_details") # ROUTE COMPLETE
 def flights():
   key = "AIzaSyCiw7ggDVbJ3R9KJsO04rC8MpZUYOynxpQ"
-  fromloc = request.args.get("from").lower()
-  toloc = request.args.get("to").lower()
+  fromloc = str(request.args.get("from")).lower()
+  toloc = str(request.args.get("to")).lower()
   date = request.args.get("date")
-  data = requests.get(f"https://maps.googleapis.com/maps/api/geocode/json?address={fromloc}&key={key}").json()
-  fromloc = requests.get(f'http://iatageo.com/getCode/{data["results"][0]["geometry"]["location"]["lat"]}/{data["results"][0]["geometry"]["location"]["lng"]}').json()["IATA"]
-  data = requests.get(f"https://maps.googleapis.com/maps/api/geocode/json?address={toloc}&key={key}").json()
-  toloc = requests.get(f'http://iatageo.com/getCode/{data["results"][0]["geometry"]["location"]["lat"]}/{data["results"][0]["geometry"]["location"]["lng"]}').json()["IATA"]
   if all([fromloc, toloc, date]):
     if len(fromloc) < 1:
       return jsonify({"success": False, "reason": "invalid_from"}), 400
@@ -443,6 +448,13 @@ def flights():
   else:
     return jsonify({"success": False, "reason": "missing_data"}), 400
   try:
+    try:
+      data = requests.get(f"https://maps.googleapis.com/maps/api/geocode/json?address={fromloc}&key={key}").json()
+      fromloc = requests.get(f'http://iatageo.com/getCode/{data["results"][0]["geometry"]["location"]["lat"]}/{data["results"][0]["geometry"]["location"]["lng"]}').json()["IATA"]
+      data = requests.get(f"https://maps.googleapis.com/maps/api/geocode/json?address={toloc}&key={key}").json()
+      toloc = requests.get(f'http://iatageo.com/getCode/{data["results"][0]["geometry"]["location"]["lat"]}/{data["results"][0]["geometry"]["location"]["lng"]}').json()["IATA"]
+    except:
+      return jsonify({"success": False, "reason": "invalid_locations"}), 400
     offers = (
     client.offer_requests.create()
     .passengers([{"type": "adult"}])
@@ -458,7 +470,7 @@ def flights():
     for offer in offers:
       flight.append({"id": offer.id, "airline": offer.owner.name, "departs": offer.slices[0].segments[0].departing_at, "cost": offer.total_amount, "currency": offer.total_currency,  "from": fromloc, "to": toloc})
     flight.sort(key=lambda e: e["cost"])
-  except Exception as e:
+  except:
     return jsonify({"success": False, "reason": "server_error"}), 500
   return jsonify({"success": True, "reason": "none", "flight": flight[0]}), 200
 
@@ -476,6 +488,8 @@ def PDRates():
     return jsonify({"success": False, "reason": "invalid_year"}), 400
   if len(str(month)) < 0 or len(str(month)) > 2:
     return jsonify({"success": False, "reason": "invalid_month"}), 400
+  if len(str(state)) < 0 or len(str(state)) > 2:
+    return jsonify({"success": False, "reason": "invalid_state"})
   try:
     datetime.datetime.strptime(f"{year}-0{month}-01", "%Y-%m-%d")
   except:
@@ -488,7 +502,8 @@ def PDRates():
       return jsonify({"success": False, "reason": "no_rates_available"}), 200
     if currentyear - 3 > year:
       return jsonify({"success": False, "reason": "no_rates_available"}), 200
-    html = requests.get(f"https://www.gsa.gov/travel/plan-book/per-diem-rates/per-diem-rates-results/?fiscal_year={year if nextyear == False else year + 1}&state={state}&perdiemSearchVO_city={city}&action=perdiems_report&zip=&op=Find+Rates&form_build_id=form-GGHt7ZcnOjh5MtzZ4RJnygTl3DivBQfZf_k071phWGU&form_id=perdiem_form")
+    url = f"https://www.gsa.gov/travel/plan-book/per-diem-rates/per-diem-rates-results/?fiscal_year={year if nextyear == False else year + 1}&state={state}&perdiemSearchVO_city={city}&action=perdiems_report&zip=&op=Find+Rates&form_build_id=form-GGHt7ZcnOjh5MtzZ4RJnygTl3DivBQfZf_k071phWGU&form_id=perdiem_form"
+    html = requests.get(url)
     page = BeautifulSoup(html.text, "html.parser")
     rate = re.sub(r'\$| USD', '', page.find("td", attrs={"headers": f"maxLodging y{year} {months[month]}"}).text)
     meals = re.sub(r'\$| USD', '', page.find("td", attrs={"headers": "MIE"}).text)
@@ -507,8 +522,11 @@ def hotels():
         return jsonify({"success": False, "reason": "invalid_location"}), 400
     else:
       return jsonify({"success": False, "reason": "missing_data"}), 400
-    data = requests.get(f"https://maps.googleapis.com/maps/api/geocode/json?address={code}&key={key}").json()
-    data = requests.get(f"https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={data['results'][0]['geometry']['location']['lat']},{data['results'][0]['geometry']['location']['lng']}&radius=32187&type=lodging&key={key}").json()
+    try:
+      data = requests.get(f"https://maps.googleapis.com/maps/api/geocode/json?address={code}&key={key}").json()
+      data = requests.get(f"https://maps.googleapis.com/maps/api/place/nearbysearch/json?location={data['results'][0]['geometry']['location']['lat']},{data['results'][0]['geometry']['location']['lng']}&radius=32187&type=lodging&key={key}").json()
+    except:
+      return jsonify({"success": False, "reason": "invalid_location"}), 400
     hotels = []
     for hotel in data["results"]:
       hotels.append({"name": hotel["name"], "address": hotel["vicinity"], "rating": hotel.get("rating", "No Ratings")})
@@ -517,16 +535,15 @@ def hotels():
     return jsonify({"success": False, "reason": "server_error"}), 500
 
 
-
 """
 -- REACT ROUTES --
 """
 
-
-# Serve the react routes
-@app.route("/", defaults={"path": ""})
-def react(path):
+@app.route("/")
+@app.route("/<route>")
+def routeHandler(route=None):
   return app.send_static_file("index.html"), 200
+
 
 
 app.run(host="0.0.0.0", port=8000)
