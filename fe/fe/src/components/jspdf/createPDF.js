@@ -35,7 +35,7 @@ async function PDFGenerator(data){
     doc.text("personnel in commercial air: " + data.peopleCommercialAir, 75, 30);
     doc.text("personnel in commercial lodging: " + data.peopleCommercialLodging, 75, 35);
     doc.text("personnel in military air: " + data.peopleMilitaryAir, 75, 40);
-    doc.text("personnel in military air: " + data.peopleGovernmentLodging, 75, 45);
+    doc.text("personnel in military lodging: " + data.peopleGovernmentLodging, 75, 45);
     doc.text("personnel in field conditions: " + data.peopleWoodsLodging, 75, 50);
     doc.text("personnel with per diem meals: " + data.peoplePerDiemFood, 75, 55);
 

@@ -1,12 +1,14 @@
 import React from 'react';
 import axios from 'axios';
 import './exercisetable.css'
+import PDFGenerator2 from '../jspdf2/createPDF2';
 
 
 class TheExerciseTable extends React.Component {
     constructor(props) {
         super(props);
         this.state = {exercises: []};
+        this.handleClick = this.handleClick.bind(this);
     }
 
     async componentDidMount() {
@@ -19,6 +21,10 @@ class TheExerciseTable extends React.Component {
           });
 
           console.log(this.state.exercises);
+    }
+
+    handleClick(event){
+        PDFGenerator2(event)
     }
 
     render() {
@@ -35,7 +41,7 @@ class TheExerciseTable extends React.Component {
                         </thead>
                         <tbody>
                             {this.state.exercises.map((exercise) => (
-                                <tr key={exercise.id}>
+                                <tr key={exercise.id} onClick={() => this.handleClick(exercise)}>
                                     <td>{exercise.exerciseName}</td>
                                     <td>{exercise.toLocation}</td>
                                     <td>{exercise.createdAt}</td>
