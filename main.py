@@ -10,7 +10,7 @@ from duffel_api import Duffel
 from flask_cors import CORS #comment this on deployment
 from bs4 import BeautifulSoup
 from passlib.hash import sha256_crypt
-from flask import Flask, jsonify, request, make_response
+from flask import Flask, jsonify, request, make_response, send_from_directory
 
 
 app = Flask(__name__, static_folder="fe/fe/build", static_url_path="")
@@ -24,9 +24,11 @@ aircraftcoll = mongoclient["Aircraft-table"]
 exercisecoll = mongoclient["Exercise-table"]
 lodgingcoll = mongoclient["Lodging-table"]
 
+
 """
 -- DRAFTS AND ARCHIVE ROUTES --
 """
+
 
 @app.route("/api/archive_save", methods=["POST"])
 def saveToArchive():
@@ -223,6 +225,16 @@ def login():
       response.set_cookie("token", account["token"], secure=True, httponly=True)
       return response, 200
     return jsonify({"success": False, "reason": "invalid"}), 400
+  except:
+    return jsonify({"success": False, "reason": "server_error"}), 500
+
+@app.route("/api/validate") # ROUTE COMPLETE
+def validate():
+  try:
+    existing = accountscoll.find_one({"token": request.cookies.get("token")})
+    if existing != None:
+      return jsonify({"success": True, "reason": "valid_token"}), 200
+    return jsonify({"success": False, "reason": "invalid_token"}), 400
   except:
     return jsonify({"success": False, "reason": "server_error"}), 500
       
@@ -517,16 +529,15 @@ def hotels():
     return jsonify({"success": False, "reason": "server_error"}), 500
 
 
-
 """
 -- REACT ROUTES --
 """
 
-
-# Serve the react routes
-@app.route("/", defaults={"path": ""})
-def react(path):
+@app.route("/")
+@app.route("/<route>")
+def routeHandler(route=None):
   return app.send_static_file("index.html"), 200
+
 
 
 app.run(host="0.0.0.0", port=8000)
